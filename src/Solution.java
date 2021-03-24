@@ -10,11 +10,7 @@ class Solution {
     boolean[] mainVisited = new boolean[5];
 
     public Solution() {
-
-        //init(5);
-        kosaraju(5, adjList);
-
-
+        kosaraju(5);
     }
 
     public void init(int V) {
@@ -25,9 +21,9 @@ class Solution {
             adjList.add(new ArrayList<>());
         }
 
+        adjList.get(1).add(0);
         adjList.get(0).add(2);
         adjList.get(0).add(3);
-        adjList.get(1).add(0);
         adjList.get(2).add(1);
         adjList.get(3).add(4);
     }
@@ -36,7 +32,7 @@ class Solution {
         new Solution();
     }
 
-    public int kosaraju(int V, ArrayList<ArrayList<Integer>> adj) {
+    public int kosaraju(int V) {
         init(V);
         getFinishingTimes();
         changeOrder();
@@ -52,11 +48,12 @@ class Solution {
         }
     }
 
+    //retrieve the number of Strongly connected components of the given graph
     public int getScc() {
         int numberOfSCCs = 0;
         for (int i = 0; i < finalAdjList.size(); i++)
             if (!mainVisited[adjList.size() - (i + 1)]) {
-                dfsForSCC(finalAdjList, mainVisited, adjList.size() - (i + 1));
+                dfsForSCC(finalAdjList, adjList.size() - (i + 1));
                 numberOfSCCs++;
             }
         return numberOfSCCs;
@@ -74,12 +71,14 @@ class Solution {
         }
     }
 
+    //calculating finishing times to determine the starting vertex
     public void getFinishingTimes() {
         for (int i = 0; i < adjList.size(); i++)
             if (!mainVisited[adjList.size() - (i + 1)])
-                dfsWithFinishingTimes(reverseGraph(adjList), mainVisited, adjList.size() - (i + 1));
+                dfsWithFinishingTimes(reverseGraph(adjList), adjList.size() - (i + 1));
     }
 
+    //reversing the graph to edges to calculate the correct finishing times
     public ArrayList<ArrayList<Integer>> reverseGraph(ArrayList<ArrayList<Integer>> adj) {
 
         ArrayList<ArrayList<Integer>> reversedGraph = new ArrayList<>();
@@ -99,7 +98,8 @@ class Solution {
     }
 
 
-    public void dfsWithFinishingTimes(ArrayList<ArrayList<Integer>> adj, boolean[] visited, int start) {
+    //dfs to the reversed graph to calculate finishing times
+    public void dfsWithFinishingTimes(ArrayList<ArrayList<Integer>> adj, int start) {
 
         mainVisited[start] = true;
 
@@ -113,7 +113,7 @@ class Solution {
 
                 if (!mainVisited[adj.get(start).get(i)]) {
 
-                    dfsWithFinishingTimes(adj, mainVisited, adj.get(start).get(i));
+                    dfsWithFinishingTimes(adj, adj.get(start).get(i));
                     if (i == adj.get(start).size() - 1) {
 
                         steps.put(start, currentSteps);
@@ -130,7 +130,8 @@ class Solution {
         }
     }
 
-    public void dfsForSCC(ArrayList<ArrayList<Integer>> adj, boolean[] visited, int start) {
+    //dfs on the original graph, but with the right starting vertex
+    public void dfsForSCC(ArrayList<ArrayList<Integer>> adj, int start) {
 
         mainVisited[start] = true;
 
@@ -139,7 +140,7 @@ class Solution {
 
             if (!mainVisited[adj.get(start).get(i)]) {
 
-                dfsForSCC(adj, mainVisited, adj.get(start).get(i));
+                dfsForSCC(adj,  adj.get(start).get(i));
 
             }
 
